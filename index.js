@@ -1,25 +1,14 @@
-import dotenv from "dotenv";
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import morgan from "morgan";
+import express from "express";
+import chatRoutes from "./routes/chat.routes.js";
 
-dotenv.config();
+const app = express();
 
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
+app.use(morgan("dev"));
+app.use(express.json());
 
-const chat = model.startChat({
-  history: [
-    {
-      role: "user",
-      parts: [{ text: "Hello" }],
-    },
-    {
-      role: "model",
-      parts: [{ text: "Great to meet you. What would you like to know?" }],
-    },
-  ],
+app.use("/api/chat", chatRoutes);
+
+app.listen(5000, () => {
+  console.log("Server is running on port 5000");
 });
-
-let result = await chat.sendMessage("I have 2 dogs in my house.");
-console.log(result.response.text());
-let result2 = await chat.sendMessage("How many paws are in my house?");
-console.log(result2.response.text());
