@@ -58,27 +58,28 @@ router.post("/", async (req, res) => {
   try {
     const { message } = req.body;
     const result = await chat.sendMessage(message);
-    // For simplicity, this uses the first function call found.
-    const call = result.response.functionCalls()[0];
-    // Call the executable function named in the function call
-    // with the arguments specified in the function call and
-    // let it call the hypothetical API.
-    if (call) {
-      const apiResponse = await functions[call.name][call.args];
 
-      console.log(apiResponse);
-      // Send the API response back to the model so it can generate
-      // a text response that can be displayed to the user.
+    const calls = result.response.functionCalls();
+
+    // cant access length of undefined var therfore, first check if it is not undefined
+    if (calls && calls.length > 0) {
+      const call = calls[0];
+      const selectedFunction = functions[call.name];
+      const apiResponse = await selectedFunction({ ...call.args });
+      let record = apiResponse;
+
       const result2 = await chat.sendMessage([
         {
           functionResponse: {
             name: "controlLight",
-            response: call.args,
+            response: apiResponse,
           },
         },
       ]);
 
-      res.status(200).send({ message: result2.response.text() });
+      res.status(200).send({ message: result2.response.text(), record });
+    } else {
+      res.status(200).send({ message: result.response.text() });
     }
   } catch (error) {
     console.error(error);
