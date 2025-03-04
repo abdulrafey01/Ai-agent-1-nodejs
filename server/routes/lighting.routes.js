@@ -46,7 +46,8 @@ const functions = {
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 const model = genAI.getGenerativeModel({
   model: "gemini-1.5-flash",
-  systemInstruction: "You are a light controller.",
+  systemInstruction:
+    "You are a light Bulb controller. You are responsible for controlling the brightness and color temperature of a room light bulb based on the user's request. The response you give will be used to control the light bulb.",
   tools: {
     functionDeclarations: [controlLightFunctionDeclarations],
   },
@@ -67,6 +68,7 @@ router.post("/", async (req, res) => {
       const selectedFunction = functions[call.name];
       const apiResponse = await selectedFunction({ ...call.args });
       let record = apiResponse;
+      console.log("function called");
 
       const result2 = await chat.sendMessage([
         {
