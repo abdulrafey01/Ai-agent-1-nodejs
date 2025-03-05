@@ -5,7 +5,9 @@ import axios from "axios";
 
 interface message {
   role: string;
-  content: string;
+  parts: {
+    text: string;
+  }[];
 }
 
 const temperatureColors: Record<string, string> = {
@@ -15,13 +17,7 @@ const temperatureColors: Record<string, string> = {
 };
 
 const page = () => {
-  const [messages, setMessages] = useState<message[]>([
-    {
-      role: "assistant",
-      content:
-        "Hello, I am the light bulb controller. How can I help you today?",
-    },
-  ]);
+  const [messages, setMessages] = useState<message[]>([]);
   const [input, setInput] = useState("");
   const [lightControl, setLightControl] = useState({
     brightness: 0,
@@ -41,18 +37,26 @@ const page = () => {
     try {
       setMessages((prevMessages) => [
         ...prevMessages,
-        { role: "user", content: input },
+        { role: "user", parts: [{ text: input }] },
       ]);
       setInput("");
       const response = await axios.post(
         `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/lighting`,
         {
           message: input,
+          history: messages,
         }
       );
       setMessages((prevMessages) => [
         ...prevMessages,
-        { role: "assistant", content: response.data.message },
+        {
+          role: "model",
+          parts: [
+            {
+              text: response.data.message,
+            },
+          ],
+        },
       ]);
       if (response.data.record) {
         setLightControl({
@@ -72,6 +76,13 @@ const page = () => {
         className="w-full relative h-screen overflow-y-auto flex flex-col justify-start items-center border-t-2 sm:border-r-4 sm:border-t-0 border-gray-300"
       >
         <div className="w-full flex flex-col gap-8 justify-center items-center  pb-40 pt-8 px-4">
+          {/* First message */}
+          <div className={`flex w-full justify-start items-center`}>
+            <span className="text-2xl">🤖</span>
+            <p className="bg-[#2f7889] max-w-[70%] text-white p-4 rounded-2xl">
+              Hello, I am the light bulb controller. How can I help you today?
+            </p>
+          </div>
           {messages.map((message, index) => (
             <div
               className={`flex w-full justify-start items-center ${
@@ -84,7 +95,9 @@ const page = () => {
                 <span className="text-2xl">🤖</span>
               )}
               <p className="bg-[#2f7889] max-w-[70%] text-white p-4 rounded-2xl">
-                {message.content}
+                {message.parts.map((part) => (
+                  <span key={part.text}>{part.text}</span>
+                ))}
               </p>
             </div>
           ))}
