@@ -7,6 +7,13 @@ interface message {
   role: string;
   content: string;
 }
+
+const temperatureColors: Record<string, string> = {
+  daylight: "#ffd600",
+  cool: "#94d1e0",
+  warm: "#ffa000",
+};
+
 const page = () => {
   const [messages, setMessages] = useState<message[]>([
     {
@@ -18,7 +25,7 @@ const page = () => {
   const [input, setInput] = useState("");
   const [lightControl, setLightControl] = useState({
     brightness: 0,
-    temperature: "warm",
+    temperature: "daylight",
   });
 
   const refScroll = useRef<HTMLInputElement>(null);
@@ -38,7 +45,7 @@ const page = () => {
       ]);
       setInput("");
       const response = await axios.post(
-        `${process.env.BACKEND_URL}/api/lighting`,
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/lighting`,
         {
           message: input,
         }
@@ -62,9 +69,9 @@ const page = () => {
       {/* Chat Container */}
       <div
         ref={refScroll}
-        className="w-full relative h-screen overflow-y-auto flex flex-col justify-start items-center border-t-2 sm:border-r-4 border-gray-300"
+        className="w-full relative h-screen overflow-y-auto flex flex-col justify-start items-center border-t-2 sm:border-r-4 sm:border-t-0 border-gray-300"
       >
-        <div className="w-full flex flex-col gap-8 justify-center items-center  pb-40 pt-8">
+        <div className="w-full flex flex-col gap-8 justify-center items-center  pb-40 pt-8 px-4">
           {messages.map((message, index) => (
             <div
               className={`flex w-full justify-start items-center ${
@@ -105,9 +112,19 @@ const page = () => {
         </form>
       </div>
       {/* Bulb Container */}
-      <div className="w-full flex justify-center items-center">
+      <div className="w-full flex justify-center items-center relative">
+        <div
+          className="absolute -top-10  w-50 h-50 rounded-full"
+          style={{
+            backgroundColor: temperatureColors[lightControl.temperature],
+            filter:
+              lightControl.brightness >= 30
+                ? `blur(${lightControl.brightness}px)`
+                : "blur(0px)",
+          }}
+        ></div>
         <Bulb
-          className=" h-90"
+          className=" h-90 z-100"
           brightness={lightControl.brightness}
           temperature={lightControl.temperature}
         />
