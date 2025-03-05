@@ -134,6 +134,7 @@ const page = () => {
               lightControl.brightness >= 30
                 ? `blur(${lightControl.brightness}px)`
                 : "blur(0px)",
+            display: lightControl.brightness >= 30 ? "block" : "none",
           }}
         ></div>
         <Bulb
