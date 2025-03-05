@@ -25,7 +25,7 @@ const page = () => {
   const [input, setInput] = useState("");
   const [lightControl, setLightControl] = useState({
     brightness: 0,
-    temperature: "daylight",
+    temperature: "",
   });
 
   const refScroll = useRef<HTMLInputElement>(null);
