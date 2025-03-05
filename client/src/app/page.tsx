@@ -14,37 +14,6 @@ const page = () => {
       content:
         "Hello, I am the light bulb controller. How can I help you today?",
     },
-    {
-      role: "user",
-      content: "I want to change the brightness of the light bulb.",
-    },
-    {
-      role: "assistant",
-      content:
-        "Hello, I am the light bulb controller. How can I help you today?",
-    },
-    {
-      role: "user",
-      content: "I want to change the brightness of the light bulb.",
-    },
-    {
-      role: "assistant",
-      content:
-        "Hello, I am the light bulb controller. How can I help you today?",
-    },
-    {
-      role: "user",
-      content: "I want to change the brightness of the light bulb.",
-    },
-    {
-      role: "assistant",
-      content:
-        "Hello, I am the light bulb controller. How can I help you today?",
-    },
-    {
-      role: "user",
-      content: "I want to change the brightness of the light bulb.",
-    },
   ]);
   const [input, setInput] = useState("");
   const [lightControl, setLightControl] = useState({
@@ -68,9 +37,12 @@ const page = () => {
         { role: "user", content: input },
       ]);
       setInput("");
-      const response = await axios.post("http://localhost:5000/api/lighting", {
-        message: input,
-      });
+      const response = await axios.post(
+        `${process.env.BACKEND_URL}/api/lighting`,
+        {
+          message: input,
+        }
+      );
       setMessages((prevMessages) => [
         ...prevMessages,
         { role: "assistant", content: response.data.message },
