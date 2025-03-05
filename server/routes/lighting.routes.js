@@ -53,10 +53,11 @@ const model = genAI.getGenerativeModel({
   },
 });
 
-const chat = model.startChat();
-
 router.post("/", async (req, res) => {
   try {
+    const chat = model.startChat({
+      history: req.body.history,
+    });
     const { message } = req.body;
     const result = await chat.sendMessage(message);
 
